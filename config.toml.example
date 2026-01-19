@@ -1,0 +1,9 @@
+TOKEN = "YOUR_BOT_TOKEN"
+API_URL = "https://api.telegram.org"
+RUST_LOG = "debug"
+# Leave blank to support all partitions
+SUPPORTED_PARTITIONS = ["boot", "dtbo",
+        "init_boot", "modem", "modemfirmware",
+        "recovery", "system_dlkm", "vbmeta",
+        "vbmeta_system", "vbmeta_vendor",
+        "vendor_boot", "vendor_dlkm"]

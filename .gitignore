@@ -1,0 +1,5 @@
+/bin
+/target
+/tmp
+/.idea
+config.toml
