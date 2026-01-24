@@ -1,3 +1,4 @@
+use crate::utils;
 use anyhow::Result;
 use log::{debug, info};
 use payload_dumper::extractor::remote::{extract_partition_remote_zip, list_partitions_remote_zip};
@@ -50,7 +51,7 @@ pub async fn dump_partition(
                     url_clone,
                     &p_name,
                     out_put,
-                    None,
+                    Option::from(utils::USER_AGENT),
                     None,
                     None,
                     None::<PathBuf>,
@@ -98,7 +99,7 @@ async fn get_rom_info(url: String) -> Result<Value> {
 
     let (tx, rx) = oneshot::channel();
     thread::spawn(move || {
-        let result = list_partitions_remote_zip(url, None, None);
+        let result = list_partitions_remote_zip(url, Option::from(utils::USER_AGENT), None);
         let _ = tx.send(result);
     });
 
