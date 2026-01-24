@@ -280,8 +280,10 @@ async fn patch_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reque
                 format!("Patch {patch_partition} successfully, uploading..."),
             )
             .await?;
-            let document = InputMediaDocument::new(InputFile::file(path.clone()));
+            let document = InputMediaDocument::new(InputFile::file(path.clone()))
+                .caption(path.file_name().unwrap().to_string_lossy().to_string());
             bot.send_media_group(status_msg.chat.id, vec![InputMedia::Document(document)])
+                .reply_to(msg.id)
                 .await?;
             bot.delete_message(msg.chat.id, status_msg.id).await?;
 
