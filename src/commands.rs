@@ -1,4 +1,5 @@
 use crate::patch_boot::patch_boot;
+use crate::utils::to_tg_md;
 use crate::{config, payload};
 use anyhow::Result;
 use log::{debug, error, info, warn};
@@ -269,10 +270,10 @@ async fn patch_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reque
     )
     .await
     {
-        Ok(path) => {
+        Ok(patched_file) => {
             info!(
                 "Patch {patch_partition} with {patch_method} successfully, patched file: {}",
-                path.display()
+                patched_file.path.display()
             );
             bot.edit_message_text(
                 status_msg.chat.id,
@@ -280,14 +281,18 @@ async fn patch_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reque
                 format!("Patch {patch_partition} successfully, uploading..."),
             )
             .await?;
-            let document = InputMediaDocument::new(InputFile::file(path.clone()))
-                .caption(path.file_name().unwrap().to_string_lossy().to_string());
+            let document = InputMediaDocument::new(InputFile::file(patched_file.path.clone()))
+                .caption(to_tg_md(format!(
+                    ">KMI: `{}`\n>Kernel Version: `{}`",
+                    patched_file.kmi, patched_file.kernel_version
+                )))
+                .parse_mode(ParseMode::MarkdownV2);
             bot.send_media_group(status_msg.chat.id, vec![InputMedia::Document(document)])
                 .reply_to(msg.id)
                 .await?;
             bot.delete_message(msg.chat.id, status_msg.id).await?;
 
-            let temp_dir = path.parent().unwrap();
+            let temp_dir = patched_file.path.parent().unwrap();
             info!("Cleaning up temporary directory: {}", temp_dir.display());
             if let Err(e) = std::fs::remove_dir_all(&temp_dir) {
                 error!(
