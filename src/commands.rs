@@ -48,6 +48,8 @@ pub enum Command {
     Help,
     #[command(description = "Start command")]
     Start,
+    #[command(description = "quote")]
+    Q,
 }
 
 pub async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
@@ -73,9 +75,24 @@ pub async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> 
                     error!("Error in help_cmd: {e}");
                 }
             }
+            Command::Q => {
+                if let Err(e) = q(bot, msg).await {
+                    error!("Error in help_cmd: {e}");
+                }
+            }
         };
     });
     Ok(())
+}
+
+async fn q(bot: Bot, msg: Message) -> Result<Message, RequestError> {
+    let msg = bot
+        .send_message(msg.chat.id, "q什么q， 不准q")
+        .reply_to(msg.id)
+        .await?;
+    tokio::time::sleep(Duration::from_secs(10)).await;
+    bot.delete_message(msg.chat.id, msg.id).await?;
+    return Ok(msg);
 }
 
 async fn dump_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, RequestError> {
