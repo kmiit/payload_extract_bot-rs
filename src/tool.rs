@@ -3,10 +3,10 @@ use bytes::Bytes;
 use log::{debug, error, info};
 use serde_json::Value;
 use std::env::consts::{ARCH, OS};
+use std::fs;
 use std::io::{Cursor, Read};
 use std::path::PathBuf;
 use std::process::exit;
-use std::fs;
 use zip::ZipArchive;
 
 #[derive(Clone)]
@@ -47,9 +47,7 @@ pub struct MAGISKBOOT(BaseTool);
 
 impl Tool for KSUD {
     fn from(basis: Basis) -> Self {
-        let mut bin = PathBuf::from("bin")
-            .join(basis.os)
-            .join(basis.arch);
+        let mut bin = PathBuf::from("bin").join(basis.os).join(basis.arch);
         bin.push(format!("{}{}", "ksud", basis.suffix));
         Self {
             0: BaseTool {
@@ -107,9 +105,7 @@ impl Tool for KSUD {
 
 impl Tool for MAGISKBOOT {
     fn from(basis: Basis) -> Self {
-        let mut bin = PathBuf::from("bin")
-            .join(basis.os)
-            .join(basis.arch);
+        let mut bin = PathBuf::from("bin").join(basis.os).join(basis.arch);
         bin.push(format!("{}{}", "magiskboot", basis.suffix));
         Self {
             0: BaseTool {

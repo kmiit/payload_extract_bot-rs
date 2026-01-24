@@ -152,7 +152,7 @@ async fn dump_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reques
                     status_msg.id,
                     format!("Partitions dumped successfully! Uploading {num_files} files...",),
                 )
-                    .await?;
+                .await?;
                 let mut caption = String::new();
                 for path in files.iter().clone() {
                     caption.push_str(&format!(
@@ -190,7 +190,7 @@ async fn dump_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reques
                             status_msg.id,
                             "All files uploaded successfully.",
                         )
-                            .await?;
+                        .await?;
                     }
                     Err(err) => {
                         error!("Error while uploading files: {err}");
@@ -199,7 +199,7 @@ async fn dump_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reques
                             status_msg.id,
                             format!("Failed to upload file: {err}"),
                         )
-                            .await?;
+                        .await?;
                     }
                 }
             };
@@ -221,7 +221,7 @@ async fn dump_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reques
                 status_msg.id,
                 format!("Failed to dump partitions: {e}"),
             )
-                .await?;
+            .await?;
         }
     }
     Ok(status_msg)
@@ -267,7 +267,7 @@ async fn patch_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reque
         patch_partition.to_string(),
         patch_method.to_string(),
     )
-        .await
+    .await
     {
         Ok(path) => {
             info!(
@@ -279,7 +279,7 @@ async fn patch_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reque
                 status_msg.id,
                 format!("Patch {patch_partition} successfully, uploading..."),
             )
-                .await?;
+            .await?;
             let document = InputMediaDocument::new(InputFile::file(path.clone()));
             bot.send_media_group(status_msg.chat.id, vec![InputMedia::Document(document)])
                 .await?;
@@ -301,7 +301,7 @@ async fn patch_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reque
                 status_msg.id,
                 format!("Failed to patch {patch_partition}: {e}"),
             )
-                .await?;
+            .await?;
         }
     };
     Ok(status_msg)
