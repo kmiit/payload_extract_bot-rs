@@ -47,7 +47,12 @@ pub struct MAGISKBOOT(BaseTool);
 
 impl Tool for KSUD {
     fn from(basis: Basis) -> Self {
-        let mut bin = PathBuf::from("bin").join(basis.os).join(basis.arch);
+        let current_dir = std::env::current_dir().unwrap();
+
+        let mut bin = PathBuf::from(current_dir)
+            .join("bin")
+            .join(basis.os)
+            .join(basis.arch);
         bin.push(format!("{}{}", "ksud", basis.suffix));
         Self {
             0: BaseTool {
@@ -105,7 +110,12 @@ impl Tool for KSUD {
 
 impl Tool for MAGISKBOOT {
     fn from(basis: Basis) -> Self {
-        let mut bin = PathBuf::from("bin").join(basis.os).join(basis.arch);
+        let current_dir = std::env::current_dir().unwrap();
+
+        let mut bin = PathBuf::from(current_dir)
+            .join("bin")
+            .join(basis.os)
+            .join(basis.arch);
         bin.push(format!("{}{}", "magiskboot", basis.suffix));
         Self {
             0: BaseTool {
