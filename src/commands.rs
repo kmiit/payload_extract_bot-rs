@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use crate::patch_boot::patch_boot;
 use crate::utils::to_tg_md;
 use crate::{config, payload};
@@ -287,29 +288,38 @@ async fn patch_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reque
                     patched_file.kmi, patched_file.kernel_version
                 )))
                 .parse_mode(ParseMode::MarkdownV2);
-            match bot.send_media_group(status_msg.chat.id, vec![InputMedia::Document(document)])
-                .reply_to(msg.id)
-                .await {
-                Ok(_) => {
-                    info!("All files uploaded successfully.");
-                    bot.edit_message_text(
-                        status_msg.chat.id,
-                        status_msg.id,
-                        "All files uploaded successfully.",
-                    )
-                    .await?;
-                    tokio::time::sleep(Duration::from_secs(10)).await;
-                    bot.delete_message(msg.chat.id, status_msg.id).await?;
+            if PathBuf::from(patched_file.path.clone()).exists() {
+                match bot.send_media_group(status_msg.chat.id, vec![InputMedia::Document(document)])
+                    .reply_to(msg.id)
+                    .await {
+                    Ok(_) => {
+                        info!("All files uploaded successfully.");
+                        bot.edit_message_text(
+                            status_msg.chat.id,
+                            status_msg.id,
+                            "All files uploaded successfully.",
+                        )
+                            .await?;
+                        tokio::time::sleep(Duration::from_secs(10)).await;
+                        bot.delete_message(msg.chat.id, status_msg.id).await?;
+                    }
+                    Err(err) => {
+                        error!("Error while uploading files: {err}");
+                        bot.edit_message_text(
+                            status_msg.chat.id,
+                            status_msg.id,
+                            format!("Failed to upload file: {err}"),
+                        )
+                            .await?;
+                    }
                 }
-                Err(err) => {
-                    error!("Error while uploading files: {err}");
-                    bot.edit_message_text(
-                        status_msg.chat.id,
-                        status_msg.id,
-                        format!("Failed to upload file: {err}"),
-                    )
+            } else {
+                bot.edit_message_text(
+                    status_msg.chat.id,
+                    status_msg.id,
+                    format!("Patched file {} not found!", patched_file.path.display()),
+                )
                     .await?;
-                }
             }
 
             let temp_dir = patched_file.path.parent().unwrap();

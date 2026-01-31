@@ -127,8 +127,11 @@ pub async fn patch_boot(
         partition: PatchPartition::from(&patch_partition)?,
     };
     let mut images = Vec::new();
-    images.push(patch_partition);
-    images.push("boot".to_string());
+    images.push(patch.partition.get_partition_name());
+    match patch.method {
+        PatchMethod::KernelSU => images.push("boot".to_string()),
+        _ => {}
+    }
     let (_, dir) = dump_partition(url.clone(), images.join(",")).await?;
     patch.patch(dir)
 }
