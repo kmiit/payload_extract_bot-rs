@@ -287,10 +287,30 @@ async fn patch_cmd(bot: Bot, msg: Message, arg: String) -> Result<Message, Reque
                     patched_file.kmi, patched_file.kernel_version
                 )))
                 .parse_mode(ParseMode::MarkdownV2);
-            bot.send_media_group(status_msg.chat.id, vec![InputMedia::Document(document)])
+            match bot.send_media_group(status_msg.chat.id, vec![InputMedia::Document(document)])
                 .reply_to(msg.id)
-                .await?;
-            bot.delete_message(msg.chat.id, status_msg.id).await?;
+                .await {
+                Ok(_) => {
+                    info!("All files uploaded successfully.");
+                    bot.edit_message_text(
+                        status_msg.chat.id,
+                        status_msg.id,
+                        "All files uploaded successfully.",
+                    )
+                    .await?;
+                    tokio::time::sleep(Duration::from_secs(10)).await;
+                    bot.delete_message(msg.chat.id, status_msg.id).await?;
+                }
+                Err(err) => {
+                    error!("Error while uploading files: {err}");
+                    bot.edit_message_text(
+                        status_msg.chat.id,
+                        status_msg.id,
+                        format!("Failed to upload file: {err}"),
+                    )
+                    .await?;
+                }
+            }
 
             let temp_dir = patched_file.path.parent().unwrap();
             info!("Cleaning up temporary directory: {}", temp_dir.display());
