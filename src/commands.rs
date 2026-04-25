@@ -13,6 +13,8 @@ use teloxide::prelude::{Message, ResponseResult};
     description = "These commands are supported:"
 )]
 pub enum Command {
+    #[command(description = "quote")]
+    Q,
     #[command(description = "Dump partition(s)")]
     Dump { arg: String },
     #[command(description = "Dump partition(s)")]
@@ -45,6 +47,11 @@ pub async fn answer(
     log_message(msg.clone()).await?;
     tokio::spawn(async move {
         match cmd {
+            Command::Q => {
+                if let Err(e) = q(bot, msg).await {
+                    error!("Error in help_cmd: {e}");
+                }
+            }
             Command::Dump { arg } | Command::Dumper { arg } => {
                 if let Err(e) = dump_cmd(bot, msg, arg, cfg).await {
                     error!("Error in dump_cmd: {e}");

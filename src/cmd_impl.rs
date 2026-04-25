@@ -435,3 +435,13 @@ async fn delete_later(
     bot.delete_message(chat_id, message_id).await?;
     Ok(())
 }
+
+pub async fn q(bot: Bot, msg: Message) -> Result<Message, RequestError> {
+    let msg = bot
+        .send_message(msg.chat.id, "q什么q， 不准q")
+        .reply_to(msg.id)
+        .await?;
+    tokio::time::sleep(Duration::from_secs(10)).await;
+    bot.delete_message(msg.chat.id, msg.id).await?;
+    return Ok(msg);
+}
